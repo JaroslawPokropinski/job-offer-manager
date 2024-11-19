@@ -33,3 +33,13 @@ export function fillInput(el: unknown, value: string) {
   el.dispatchEvent(new Event("input", { bubbles: true }));
   el.blur();
 }
+
+export function getElementByXpath(path: string, thatDocument: Document) {
+  return thatDocument.evaluate(
+    path,
+    thatDocument,
+    null,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null
+  ).singleNodeValue;
+}
