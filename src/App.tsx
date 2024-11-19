@@ -1,12 +1,9 @@
 import { Box, createTheme, ThemeProvider } from "@mui/material";
 import { createHashRouter, RouterProvider } from "react-router-dom";
-import { AppGrid } from "./pages/AppGrid";
-import { AddSingle } from "./pages/AddSingle";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { setDefaultOptions } from "date-fns";
 import { pl } from "date-fns/locale/pl";
-import { AddMultiple } from "./pages/AddMultiple";
 
 setDefaultOptions({ locale: pl });
 
@@ -20,15 +17,22 @@ const theme = createTheme({
 const router = createHashRouter([
   {
     path: "/",
-    element: <AppGrid />,
+    lazy: () =>
+      import("./pages/AppGrid").then(({ AppGrid }) => ({ Component: AppGrid })),
   },
   {
     path: "/add",
-    element: <AddSingle />,
+    lazy: () =>
+      import("./pages/AddSingle").then(({ AddSingle }) => ({
+        Component: AddSingle,
+      })),
   },
   {
     path: "/add-multiple",
-    element: <AddMultiple />,
+    lazy: () =>
+      import("./pages/AddMultiple").then(({ AddMultiple }) => ({
+        Component: AddMultiple,
+      })),
   },
 ]);
 
