@@ -2,7 +2,7 @@
 
 Job Offer Manager is an app to manage job listings you are thinking of applying to.
 
-It supports autofill from nofluffjobs and pracuj.pl and batch import using list of URLs.
+It supports autofill from nofluffjobs, pracuj.pl, justjoin, the:protocol and batch import using list of URLs.
 
 ## Job Offers Grid
 
