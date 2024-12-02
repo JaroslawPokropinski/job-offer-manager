@@ -30,8 +30,8 @@ function InputRowBody({
 
     const listener = () => {
       const element = current as HTMLInputElement | null;
-      if (type === "date") {
-        setDateValue(parse(element?.value ?? "", "P", new Date()));
+      if (type === "date" && element) {
+        setDateValue(new Date(element.value));
         return;
       }
       setValue(element?.value ?? "");
@@ -52,6 +52,10 @@ function InputRowBody({
         value={dateValue}
         onChange={(newValue) => {
           setDateValue(newValue);
+          inputRef.current?.setAttribute(
+            "data-iso-date",
+            newValue?.toISOString() ?? ""
+          );
         }}
         inputRef={inputRef}
         sx={{

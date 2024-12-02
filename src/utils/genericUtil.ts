@@ -11,12 +11,14 @@ export function isValueElement(
 }
 
 export function getFormData(form: HTMLFormElement) {
-  const objEntries = Object.entries(form.elements)
-    .filter((e) => e[0].match(/^[a-z]/i))
-    .map((e) => {
-      const element = e[1];
+  const objEntries = Object.values(form.elements)
+    .filter((element) => element.getAttribute("name")?.match(/^[a-z]/i))
+    .map((element) => {
       if (isValueElement(element)) {
-        return [e[0], element.value] as const;
+        return [
+          element.getAttribute("name"),
+          element.getAttribute("data-iso-date") ?? element.value,
+        ] as const;
       }
 
       return null;

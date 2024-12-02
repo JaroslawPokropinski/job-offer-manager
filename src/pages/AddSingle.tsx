@@ -44,7 +44,6 @@ export function AddSingle() {
         ev.preventDefault();
         if (!formRef.current) return;
 
-        console.log(getFormData(formRef.current));
         // get current data from local storage
         const jobOffersStr = localStorage.getItem("job-offers");
         let jobOffers: Record<string, string>[] = jobOffersStr

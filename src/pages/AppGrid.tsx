@@ -19,6 +19,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { compareDesc, parse, subDays } from "date-fns";
 
+type GridRow = {
+  id: string;
+  position?: string;
+  company?: string;
+  status?: string;
+  url?: string;
+  salary?: string;
+  appliedDate?: string;
+  location?: string;
+  description?: string;
+};
+
 const columns: GridColDef[] = [
   { field: "position", headerName: "Position", width: 250 },
   { field: "company", headerName: "Company", width: 200 },
@@ -30,7 +42,12 @@ const columns: GridColDef[] = [
     renderCell: (params) => <Link href={params.value}>{params.value}</Link>,
   },
   { field: "salary", headerName: "Salary", width: 300 },
-  { field: "appliedDate", headerName: "Applied Date", width: 120 },
+  {
+    field: "appliedDate",
+    headerName: "Applied Date",
+    width: 120,
+    renderCell: (params) => new Date(params.value ?? "").toLocaleDateString(),
+  },
   { field: "location", headerName: "Location", width: 200 },
   { field: "description", headerName: "Description", flex: 1 },
 ];
@@ -48,15 +65,48 @@ export function AppGrid() {
     },
   ]);
 
-  const [rows, setRows] = useState(() => {
+  const [rows, setRows] = useState<GridRow[]>(() => {
     const data = localStorage.getItem("job-offers");
-    return data ? JSON.parse(data) : [];
+    const loadedData: GridRow[] = data ? JSON.parse(data) : [];
+
+    let didSchemaChange = false;
+
+    const updatedData = loadedData.map((row) => {
+      const isIsoDate =
+        row.appliedDate?.includes("T") && row.appliedDate?.endsWith("Z");
+      let appliedDate = row.appliedDate;
+      try {
+        const appliedDateAsDate = !isIsoDate
+          ? parse(row.appliedDate ?? "", "P", new Date())
+          : new Date(row.appliedDate ?? "");
+
+        appliedDate = appliedDateAsDate.toISOString();
+      } catch {
+        // ignore
+      }
+
+      if (!isIsoDate) {
+        didSchemaChange = true;
+      }
+
+      return {
+        ...row,
+        appliedDate,
+      };
+    });
+
+    // convert saved data to new format (applied date to ISO date)
+    if (didSchemaChange) {
+      localStorage.setItem("job-offers", JSON.stringify(updatedData));
+    }
+
+    return updatedData;
   });
 
   return (
     <>
       <Paper className="h-full">
-        <DataGrid
+        <DataGrid<GridRow>
           rows={rows}
           columns={columns}
           sortModel={sortModel}
@@ -71,17 +121,24 @@ export function AppGrid() {
             navigate(`/add?id=${row.id}`);
           }}
           getRowClassName={(params) => {
-            const appliedDate = parse(
-              params.row.appliedDate ?? "",
-              "P",
-              new Date()
-            );
+            const appliedDate =
+              params.row.appliedDate && new Date(params.row.appliedDate);
 
-            if (compareDesc(appliedDate, subDays(new Date(), 7)) > 0) {
+            if (params.row.status?.toLowerCase().includes("declined")) {
+              return "opacity-40";
+            }
+
+            if (
+              appliedDate &&
+              compareDesc(appliedDate, subDays(new Date(), 7)) > 0
+            ) {
               return "opacity-70";
             }
 
-            if (compareDesc(appliedDate, subDays(new Date(), 14)) > 0) {
+            if (
+              appliedDate &&
+              compareDesc(appliedDate, subDays(new Date(), 14)) > 0
+            ) {
               return "opacity-40";
             }
 
