@@ -10,7 +10,7 @@ export function isValueElement(
   );
 }
 
-export function getFormData(form: HTMLFormElement) {
+export function getFormData(form: HTMLFormElement): Record<string, string> {
   const objEntries = Object.values(form.elements)
     .filter((element) => element.getAttribute("name")?.match(/^[a-z]/i))
     .map((element) => {

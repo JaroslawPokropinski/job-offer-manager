@@ -1,7 +1,6 @@
 import { Autocomplete, Box, SxProps, TextField, Theme } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useEffect, useRef, useState } from "react";
-import { parse } from "date-fns";
 
 type InputRowProps = {
   name: string;
